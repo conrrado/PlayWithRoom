@@ -6,9 +6,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import android.os.Bundle;
 import android.view.View;
 
-import com.ccamacho.playwithroom.R;
 import com.ccamacho.playwithroom.adapters.PlayGameAdapter;
-import com.ccamacho.playwithroom.database.DatabaseConnection;
+import com.ccamacho.playwithroom.database.PlayGameOperations;
 import com.ccamacho.playwithroom.databinding.ActivityMainBinding;
 import com.ccamacho.playwithroom.model.PlayGame;
 
@@ -19,8 +18,8 @@ public class MainActivity extends AppCompatActivity {
 
     ActivityMainBinding binding;
     List<PlayGame> playGameList;
-    DatabaseConnection connection;
     PlayGameAdapter adapter;
+    PlayGameOperations operations;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         playGameList = new ArrayList<>();
-        connection = DatabaseConnection.getInstance(this);
+        operations = new PlayGameOperations(this);
 
         adapter = new PlayGameAdapter(playGameList);
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -39,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 PlayGame playGame = new PlayGame("Pega-pega", 3, "Brincar de pega pega");
-                connection.playGameDao().insert(playGame);
+                operations.insertPlayGame(playGame);
                 updateList();
             }
         });
@@ -55,16 +54,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (!playGameList.isEmpty()) {
-                    connection.playGameDao().delete(playGameList.get(playGameList.size() - 1));
+                    operations.deletePlayGame(playGameList.get(playGameList.size() - 1));
                     updateList();
                 }
             }
         });
+
+        updateList();
     }
 
     private void updateList() {
         playGameList.clear();
-        playGameList.addAll(connection.playGameDao().getAll());
+        playGameList.addAll(operations.getAllGames());
         binding.recyclerView.scrollToPosition(adapter.getItemCount() - 1);
         adapter.notifyDataSetChanged();
     }

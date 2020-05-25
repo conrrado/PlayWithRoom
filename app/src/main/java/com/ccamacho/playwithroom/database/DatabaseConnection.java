@@ -15,10 +15,9 @@ public abstract class DatabaseConnection extends RoomDatabase {
 
     public abstract PlayGameDao playGameDao();
 
-    public static DatabaseConnection getInstance(Context context) {
+    static DatabaseConnection getInstance(Context context) {
         if (instance == null) {
             instance = Room.databaseBuilder(context, DatabaseConnection.class, "playgames_database")
-                    .allowMainThreadQueries()
                     .build();
         }
         return instance;
